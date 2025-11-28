@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Auth & Login as Admin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #0f172a;
+            color: white;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: #1e293b;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background: #ea580c;
+        }
+        .success {
+            color: #10b981;
+            margin-top: 20px;
+        }
+        .error {
+            color: #ef4444;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Admin Fix Tool</h1>
+        <p>This will clear your cached auth data and log you in as admin</p>
+        <button onclick="clearAndLogin()">Clear Cache & Login as Admin</button>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        async function clearAndLogin() {
+            const messageDiv = document.getElementById('message');
+
+            try {
+                // Clear localStorage
+                localStorage.clear();
+                sessionStorage.clear();
+                messageDiv.innerHTML = '<p class="success">✅ Cache cleared!</p>';
+
+                // Wait a bit
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // Login as admin
+                messageDiv.innerHTML += '<p>🔄 Logging in as admin...</p>';
+
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'admin@streamverse.com',
+                        password: 'admin123'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Login failed: ' + response.statusText);
+                }
+
+                const data = await response.json();
+
+                // Check if isAdmin is in the response
+                if (data.data.isAdmin) {
+                    messageDiv.innerHTML += '<p class="success">✅ Admin flag found: ' + data.data.isAdmin + '</p>';
+                } else {
+                    messageDiv.innerHTML += '<p class="error">❌ WARNING: isAdmin field is missing or false!</p>';
+                }
+
+                // Store the auth data
+                const authState = {
+                    state: {
+                        user: {
+                            id: data.data.userId,
+                            email: data.data.email,
+                            name: data.data.name,
+                            isAdmin: data.data.isAdmin,
+                            subscription: data.data.subscription,
+                            profiles: data.data.profiles
+                        },
+                        token: data.data.accessToken,
+                        isAuthenticated: true
+                    },
+                    version: 0
+                };
+
+                localStorage.setItem('authStore', JSON.stringify(authState));
+
+                messageDiv.innerHTML += '<p class="success">✅ Logged in successfully!</p>';
+                messageDiv.innerHTML += '<p class="success">✅ Auth data stored with isAdmin: ' + data.data.isAdmin + '</p>';
+                messageDiv.innerHTML += '<p style="margin-top: 20px;">Redirecting to admin dashboard in 2 seconds...</p>';
+
+                // Redirect to admin dashboard
+                setTimeout(() => {
+                    window.location.href = '/admin';
+                }, 2000);
+
+            } catch (error) {
+                messageDiv.innerHTML = '<p class="error">❌ Error: ' + error.message + '</p>';
+                console.error('Full error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

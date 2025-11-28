@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Auth State</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #0f172a;
+            color: white;
+            padding: 20px;
+        }
+        pre {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .warning { color: #f59e0b; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Auth State Debug</h1>
+
+    <h2>LocalStorage authStore:</h2>
+    <pre id="authStore"></pre>
+
+    <h2>API Test - Login Response:</h2>
+    <pre id="apiTest"></pre>
+
+    <button onclick="testLogin()" style="background: #f97316; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 10px 0;">
+        Test Login API
+    </button>
+
+    <script>
+        // Show current localStorage
+        const authStore = localStorage.getItem('authStore');
+        const authStoreEl = document.getElementById('authStore');
+
+        if (authStore) {
+            const parsed = JSON.parse(authStore);
+            authStoreEl.innerHTML = JSON.stringify(parsed, null, 2);
+
+            if (parsed.state && parsed.state.user) {
+                if (parsed.state.user.isAdmin) {
+                    authStoreEl.innerHTML += '\n\n<span class="success">✅ isAdmin: ' + parsed.state.user.isAdmin + '</span>';
+                } else {
+                    authStoreEl.innerHTML += '\n\n<span class="error">❌ isAdmin: ' + parsed.state.user.isAdmin + ' (FALSE or MISSING!)</span>';
+                }
+            }
+        } else {
+            authStoreEl.innerHTML = '<span class="error">No authStore found in localStorage</span>';
+        }
+
+        async function testLogin() {
+            const apiTestEl = document.getElementById('apiTest');
+            apiTestEl.innerHTML = 'Testing login API...';
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'admin@streamverse.com',
+                        password: 'admin123'
+                    })
+                });
+
+                const data = await response.json();
+                apiTestEl.innerHTML = JSON.stringify(data, null, 2);
+
+                if (data.data && data.data.isAdmin) {
+                    apiTestEl.innerHTML += '\n\n<span class="success">✅ API returns isAdmin: ' + data.data.isAdmin + '</span>';
+                } else {
+                    apiTestEl.innerHTML += '\n\n<span class="error">❌ API does NOT return isAdmin field!</span>';
+                    apiTestEl.innerHTML += '\n<span class="warning">⚠️  Backend is not sending isAdmin in login response</span>';
+                }
+            } catch (error) {
+                apiTestEl.innerHTML = '<span class="error">Error: ' + error.message + '</span>';
+            }
+        }
+
+        // Auto-run test on load
+        testLogin();
+    </script>
+</body>
+</html>

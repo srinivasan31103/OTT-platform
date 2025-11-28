@@ -1,0 +1,145 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Testing
+coverage
+*.lcov
+.nyc_output
+
+# Build outputs
+dist
+dist-ssr
+build
+*.local
+
+# Cache
+.cache
+.vite
+.eslintcache
+.stylelintcache
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+
+# Upload directories
+uploads/
+public/uploads/
+backend/uploads/
+
+# Video files (large)
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+*.flv
+*.wmv
+
+# HLS segments (except samples)
+*.ts
+!public/hls/sample/**/*.ts
+!public/hls/sample-encrypted/**/*.ts
+
+# Encryption keys
+*.key
+encryption.key
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Package manager
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Optional: Comment out if you want to commit lock files
+# !package-lock.json
+# !yarn.lock
+# !pnpm-lock.yaml
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Certificates
+*.pem
+*.crt
+*.key
+*.cert
+
+# CDN cache
+.cdn-cache/
+
+# Redis dumps
+dump.rdb
+
+# MongoDB dumps
+dump/
+
+# PM2
+.pm2/
+pm2.config.js
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Sentry
+.sentryclirc
+
+# Vercel
+.vercel
+
+# Cloudflare
+.wrangler/
+NUL
+nul
+backend/NUL
