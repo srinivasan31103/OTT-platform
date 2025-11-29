@@ -132,4 +132,16 @@ export const watchPartyApi = {
     apiClient.post(`/party/${partyId}/chat`, { message }),
 };
 
+export const adApi = {
+  getActiveAds: (placement) => apiClient.get('/ads/active', { params: { placement } }),
+  trackImpression: (adId) => apiClient.post(`/ads/${adId}/impression`),
+  trackClick: (adId) => apiClient.post(`/ads/${adId}/click`),
+};
+
+export const bannerApi = {
+  getActiveBanners: (page) => apiClient.get('/banners/active', { params: { page } }),
+  trackView: (bannerId) => apiClient.post(`/banners/${bannerId}/view`),
+  trackClick: (bannerId) => apiClient.post(`/banners/${bannerId}/click`),
+};
+
 export default apiClient;

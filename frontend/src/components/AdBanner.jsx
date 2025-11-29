@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import axios from 'axios';
+import apiClient from '../api/apiClient';
 
 /**
  * AdBanner Component
@@ -47,8 +47,8 @@ const AdBanner = ({
   const fetchAds = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(
-        `http://localhost:5000/api/ads/active?placement=${placement}`
+      const response = await apiClient.get(
+        `/ads/active?placement=${placement}`
       );
 
       if (response.data.success && response.data.data.length > 0) {
@@ -64,7 +64,7 @@ const AdBanner = ({
 
   const trackImpression = async (adId) => {
     try {
-      await axios.post(`http://localhost:5000/api/ads/${adId}/impression`);
+      await apiClient.post(`/ads/${adId}/impression`);
     } catch (error) {
       console.error('Error tracking impression:', error);
     }
@@ -72,7 +72,7 @@ const AdBanner = ({
 
   const trackClick = async (adId) => {
     try {
-      await axios.post(`http://localhost:5000/api/ads/${adId}/click`);
+      await apiClient.post(`/ads/${adId}/click`);
     } catch (error) {
       console.error('Error tracking click:', error);
     }
