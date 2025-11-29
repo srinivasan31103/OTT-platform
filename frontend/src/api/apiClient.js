@@ -66,12 +66,14 @@ export const contentApi = {
 };
 
 export const playbackApi = {
-  saveProgress: (videoId, progress, duration) =>
-    apiClient.post('/playback/progress', { videoId, progress, duration }),
-  getProgress: (videoId) => apiClient.get(`/playback/progress/${videoId}`),
-  addToHistory: (videoId) => apiClient.post('/playback/history', { videoId }),
-  getHistory: () => apiClient.get('/playback/history'),
-  clearHistory: () => apiClient.delete('/playback/history'),
+  saveProgress: (contentId, progress, duration) =>
+    apiClient.put(`/watch/history/${contentId}`, { progress, duration }),
+  getProgress: (contentId) => apiClient.get(`/watch/watched/${contentId}`),
+  addToHistory: (contentId) => apiClient.post('/watch/history', { contentId }),
+  getHistory: () => apiClient.get('/watch/history'),
+  clearHistory: () => apiClient.delete('/watch/history'),
+  getContinueWatching: () => apiClient.get('/watch/continue-watching'),
+  getRecentlyWatched: () => apiClient.get('/watch/recently-watched'),
 };
 
 export const watchlistApi = {
@@ -81,31 +83,20 @@ export const watchlistApi = {
   remove: (contentId) => apiClient.delete(`/watchlist/${contentId}`),
 };
 
-export const chatApi = {
-  getMessages: (channelId) =>
-    apiClient.get(`/chat/${channelId}`, { params: { limit: 50 } }),
-  sendMessage: (channelId, message) =>
-    apiClient.post(`/chat/${channelId}`, { message }),
-  deleteMessage: (messageId) =>
-    apiClient.delete(`/chat/message/${messageId}`),
-};
-
 export const userApi = {
-  getProfile: () => apiClient.get('/user/profile'),
-  updateProfile: (data) => apiClient.put('/user/profile', data),
+  getProfile: () => apiClient.get('/auth/me'),
+  updateProfile: (data) => apiClient.put('/auth/profile', data),
   updatePassword: (currentPassword, newPassword) =>
-    apiClient.post('/user/update-password', { currentPassword, newPassword }),
-  deleteAccount: () => apiClient.delete('/user/account'),
+    apiClient.post('/auth/reset-password', { currentPassword, newPassword }),
 };
 
 export const paymentApi = {
-  getSubscriptionPlans: () => apiClient.get('/payments/plans'),
+  getSubscriptionPlans: () => apiClient.get('/subscriptions/plans'),
   initiatePurchase: (planId) =>
-    apiClient.post('/payments/initiate', { planId }),
-  verifyPayment: (transactionId) =>
-    apiClient.post('/payments/verify', { transactionId }),
-  getSubscriptionStatus: () => apiClient.get('/payments/subscription'),
-  cancelSubscription: () => apiClient.post('/payments/cancel'),
+    apiClient.post('/subscriptions/upgrade', { planId }),
+  getSubscriptionStatus: () => apiClient.get('/subscriptions/status'),
+  getCurrentSubscription: () => apiClient.get('/subscriptions/current'),
+  cancelSubscription: () => apiClient.post('/subscriptions/cancel'),
 };
 
 export const adminApi = {
@@ -130,12 +121,15 @@ export const adminApi = {
 
 export const watchPartyApi = {
   create: (contentId, contentType) =>
-    apiClient.post('/watch-party', { contentId, contentType }),
-  join: (partyId) => apiClient.post(`/watch-party/${partyId}/join`),
-  getParty: (partyId) => apiClient.get(`/watch-party/${partyId}`),
-  leave: (partyId) => apiClient.post(`/watch-party/${partyId}/leave`),
+    apiClient.post('/party', { contentId, contentType }),
+  join: (partyId) => apiClient.post(`/party/${partyId}/join`),
+  getParty: (partyId) => apiClient.get(`/party/${partyId}`),
+  leave: (partyId) => apiClient.post(`/party/${partyId}/leave`),
   sync: (partyId, currentTime) =>
-    apiClient.post(`/watch-party/${partyId}/sync`, { currentTime }),
+    apiClient.post(`/party/${partyId}/sync`, { currentTime }),
+  getChat: (partyId) => apiClient.get(`/party/${partyId}/chat`),
+  sendChat: (partyId, message) =>
+    apiClient.post(`/party/${partyId}/chat`, { message }),
 };
 
 export default apiClient;
