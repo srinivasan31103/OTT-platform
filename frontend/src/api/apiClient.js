@@ -144,4 +144,9 @@ export const bannerApi = {
   trackClick: (bannerId) => apiClient.post(`/banners/${bannerId}/click`),
 };
 
+export const chatApi = {
+  getMessages: (channelId) => apiClient.get(`/party/${channelId}/chat`),
+  sendMessage: (channelId, message) => apiClient.post(`/party/${channelId}/chat`, { message }),
+};
+
 export default apiClient;
