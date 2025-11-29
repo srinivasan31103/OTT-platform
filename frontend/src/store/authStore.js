@@ -1,9 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import axios from 'axios';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 export const useAuthStore = create(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       token: null,
       isAuthenticated: false,
@@ -16,18 +19,12 @@ export const useAuthStore = create(
       login: async (email, password) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
+          const response = await axios.post(`${API_BASE_URL}/auth/login`, {
+            email,
+            password,
           });
 
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: 'Login failed' }));
-            throw new Error(errorData.message || 'Login failed');
-          }
-
-          const data = await response.json();
+          const data = response.data;
           set({
             user: {
               id: data.data.userId,
@@ -43,26 +40,22 @@ export const useAuthStore = create(
           });
           return data;
         } catch (error) {
-          set({ error: error.message, isLoading: false });
-          throw error;
+          const message = error.response?.data?.message || error.message || 'Login failed';
+          set({ error: message, isLoading: false });
+          throw new Error(message);
         }
       },
 
       register: async (email, password, name) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await fetch('/api/auth/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password, name }),
+          const response = await axios.post(`${API_BASE_URL}/auth/register`, {
+            email,
+            password,
+            name,
           });
 
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: 'Registration failed' }));
-            throw new Error(errorData.message || 'Registration failed');
-          }
-
-          const data = await response.json();
+          const data = response.data;
           set({
             user: {
               id: data.data.userId,
@@ -78,8 +71,9 @@ export const useAuthStore = create(
           });
           return data;
         } catch (error) {
-          set({ error: error.message, isLoading: false });
-          throw error;
+          const message = error.response?.data?.message || error.message || 'Registration failed';
+          set({ error: message, isLoading: false });
+          throw new Error(message);
         }
       },
 
@@ -92,26 +86,18 @@ export const useAuthStore = create(
       },
 
       verifyToken: async () => {
-        const token = localStorage.getItem('authStore')
-          ? JSON.parse(localStorage.getItem('authStore')).state.token
-          : null;
+        const token = get().token;
 
         if (!token) return false;
 
         try {
-          const response = await fetch('/api/auth/verify', {
+          const response = await axios.get(`${API_BASE_URL}/auth/verify`, {
             headers: { 'Authorization': `Bearer ${token}` },
           });
 
-          if (!response.ok) {
-            set({ isAuthenticated: false, token: null, user: null });
-            return false;
-          }
-
-          const result = await response.json();
+          const result = response.data;
           console.log('verifyToken - Response:', result);
 
-          // Backend returns { success: true, data: userObject }
           const userData = result.data;
 
           set({
@@ -134,7 +120,7 @@ export const useAuthStore = create(
           return true;
         } catch (error) {
           console.error('verifyToken error:', error);
-          set({ isAuthenticated: false, user: null });
+          set({ isAuthenticated: false, user: null, token: null });
           return false;
         }
       },

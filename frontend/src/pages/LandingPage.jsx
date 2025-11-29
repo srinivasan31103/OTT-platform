@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Play, Check, Star, Tv, Film, Zap, Users, Shield, Download } from 'lucide-react';
-import axios from 'axios';
+import apiClient from '../api/apiClient';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ const LandingPage = () => {
 
   const fetchBanners = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/banners/active?page=home');
+      const response = await apiClient.get('/banners/active?page=home');
       if (response.data.success) {
         setBanners(response.data.data);
       }
@@ -37,7 +37,7 @@ const LandingPage = () => {
 
   const fetchFeaturedContent = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/movies?limit=6&featured=true');
+      const response = await apiClient.get('/movies?limit=6&featured=true');
       if (response.data.success) {
         setFeaturedContent(response.data.data);
       }
@@ -48,7 +48,7 @@ const LandingPage = () => {
 
   const handleBannerClick = async (banner) => {
     try {
-      await axios.post(`http://localhost:5000/api/banners/${banner._id}/click`);
+      await apiClient.post(`/banners/${banner._id}/click`);
       if (banner.ctaLink) {
         navigate(banner.ctaLink);
       }
