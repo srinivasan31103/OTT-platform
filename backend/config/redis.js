@@ -3,12 +3,20 @@ import { createClient } from 'redis';
 let redisClient;
 
 const connectRedis = async () => {
+  const redisUrl = process.env.REDIS_URL;
+
+  // Skip Redis if not configured or explicitly disabled
+  if (!redisUrl || redisUrl === 'skip' || redisUrl === 'none') {
+    console.log('ℹ️  Redis disabled - running without caching');
+    return null;
+  }
+
   try {
     redisClient = createClient({
-      url: process.env.REDIS_URL || 'redis://localhost:6379',
+      url: redisUrl,
       socket: {
         reconnectStrategy: (retries) => {
-          if (retries > 10) {
+          if (retries > 3) {
             console.error('❌ Redis max retries reached');
             return new Error('Redis max retries reached');
           }
@@ -34,6 +42,7 @@ const connectRedis = async () => {
     return redisClient;
   } catch (error) {
     console.error('❌ Redis connection failed:', error.message);
+    console.log('ℹ️  Continuing without Redis caching');
     return null;
   }
 };
